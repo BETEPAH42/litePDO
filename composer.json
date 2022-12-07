@@ -1,5 +1,5 @@
 {
-    "name": "sharapov/litepdo",
+    "name": "sharapov42/litepdo",
     "description": "Облегченный PDO для MySQL",
     "type": "library",
     "license": "MIT",
@@ -13,7 +13,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "sharapov\\litepdo\\": "src/"
+            "sharapov42\\litepdo\\": "src/"
         }
     },
     "require": {
