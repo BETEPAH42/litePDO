@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "keywords": ["PDO"],
-    "homepage": "https://github.com/BETEPAH42/",
+    "homepage": "https://github.com/BETEPAH42/litePDO",
     "authors": [
         {
             "name": "Jurii Sharapov",
