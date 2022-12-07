@@ -1,5 +1,5 @@
 {
-    "name": "sharapov/lite-PDO",
+    "name": "sharapov/litepdo",
     "description": "Облегченный PDO для MySQL",
     "type": "library",
     "license": "MIT",
