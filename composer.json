@@ -1,0 +1,19 @@
+{
+    "name": "sharapov/litePDO",
+    "description": "Облегченный PDO для MySQL",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["PDO"],
+    "homepage": "hhttps://github.com/BETEPAH42/",
+    "authors": [
+        {
+            "name": "Jurii Sharapov",
+            "email": "sharapov.42@yandex.ru"
+        }
+    ],
+    "autoload": {
+    },
+    "require": {
+        "php": "^7.1 || ^8.0"
+    }
+}
