@@ -3,7 +3,6 @@
     "description": "Облегченный PDO для MySQL",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
     "keywords": ["PDO","MySQL"],
     "homepage": "https://github.com/BETEPAH42/litePDO",
     "authors": [
