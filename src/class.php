@@ -1,5 +1,7 @@
 <?php
 
+namespace litePDO;
+
 class SQL
 {
     /** Init and connect */
