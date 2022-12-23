@@ -2,33 +2,37 @@
 
 namespace litePDO;
 
+use PDO;
+use configConect\configFile;
+use PDOException;
+
 class SQL
 {
+    public $db,$host,$user,$pass, $params, $connection;
+
+
     /** Init and connect */
-    private static function init()
+    function __construct($file)
     {
-        $dbConnection = null;
-        if (in_array($_SERVER['SERVER_NAME'], ['localhost'])) {
-            ini_set('display_errors', 'On');
-            error_reporting(E_ALL & ~E_NOTICE);
-        } else {
-            ini_set('display_errors', 'Off');
+        $params = new configFile($file);
+        $this->param = $params->getParams();
+        $this->db = $this->param['db'];
+        $this->host = $this->param['host'];
+        $this->user = $this->param['username'];
+        $this->pass = $this->param['password'];
+        try{       
+            $dbConnection = new PDO('mysql:dbname=' . $this->db . ';host=' . $this->host . ';charset=utf8', $this->user, $this->pass);
+            $dbConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $dbConnection->exec('set names utf8');
+            $dbConnection->exec('SET SESSION group_concat_max_len = 1000000');
+            $dbConnection->exec("SET sql_mode=''");
+        $this->connection = $dbConnection;
+        } catch (PDOException $e) {
+            print "Error!: " . $e->getMessage();
+            die();
         }
-
-        if (file_exists(__DIR__ . '/../db.cfg.php')) {
-            include __DIR__ . '/../db.cfg.php';
-            $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
-        } else {
-            if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php')) {
-                include $_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php';
-                $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
-            }
-            // можно добавить свои настройки на прямую, но не желательно
-            // else {
-            // $dbConnection = new PDO('mysql:dbname='database';host='localhost';charset=utf8', 'user', 'password');
-            //}
-        }
-
+        
         $dbConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $dbConnection->exec('set names utf8');
@@ -36,6 +40,45 @@ class SQL
         $dbConnection->exec("SET sql_mode=''");
 
         return $dbConnection;
+    }
+
+    public static function init()
+    {
+        $dbConnection = null;
+        // if (in_array($_SERVER['SERVER_NAME'], ['localhost'])) {
+        //     ini_set('display_errors', 'On');
+        //     error_reporting(E_ALL & ~E_NOTICE);
+        // } else {
+        //     ini_set('display_errors', 'Off');
+        // }
+
+        // if (file_exists(__DIR__ . '/../db.cfg.php')) {
+        //     include __DIR__ . '/../db.cfg.php';
+        //     $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
+        // } else {
+        //     // if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php')) {
+        //     //     include $_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php';
+        //     //     $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
+        //     // }
+
+        //    // можно добавить свои настройки на прямую, но не желательно
+        //     // else {
+        //     // $dbConnection = new PDO('mysql:dbname='database';host='localhost';charset=utf8', 'user', 'password');
+        //     //}
+        // }
+        $bd = $this->db;
+        $dbConnection = new PDO('mysql:dbname=' . $this->db . ';host=' . $this->host . ';charset=utf8', $this->user, $this->pass);
+        $dbConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $dbConnection->exec('set names utf8');
+        $dbConnection->exec('SET SESSION group_concat_max_len = 1000000');
+        $dbConnection->exec("SET sql_mode=''");
+
+        return $dbConnection;
+    }
+
+    public function getParams() {
+        return $this->db;   
     }
 
     public static function q($sql, $params = [])
