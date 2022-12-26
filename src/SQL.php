@@ -6,79 +6,37 @@ use PDO;
 use configConect\configFile;
 use PDOException;
 
-class SQL
+class SQL 
 {
-    public $db,$host,$user,$pass, $params;
+    protected $params;
     private static $instance;
     private $pdo;
 
     /** Init and connect */
-    function __construct()
+    public function __construct()
     {
         $params = new configFile();
-        $this->param = $params->getParams();
-        $this->db = $this->param['db'];
-        $this->host = $this->param['host'];
-        $this->user = $this->param['username'];
-        $this->pass = $this->param['password'];
-        try{       
-            $this->pdo = new PDO('mysql:dbname=' . $this->db . ';host=' . $this->host . ';charset=utf8', $this->user, $this->pass);
+        $this->params = $params->getParams();
+
+        try{
+            $this->pdo = new PDO('mysql:dbname=' . $this->params['db'] . ';host=' . $this->params['host']. ';charset=utf8', $this->params['username'], $this->params['password']);
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->exec('set names utf8');
             $this->pdo->exec('SET SESSION group_concat_max_len = 1000000');
             $this->pdo->exec("SET sql_mode=''");
         } catch (PDOException $e) {
-            print "Error!: " . $e->getMessage();
+            print "Error!: <pre>" . print_r($e)."</pre>";
             die();
-        }
-    }
-
-    // public static function init()
-    // {
-    //     $dbConnection = null;
-        // if (in_array($_SERVER['SERVER_NAME'], ['localhost'])) {
-        //     ini_set('display_errors', 'On');
-        //     error_reporting(E_ALL & ~E_NOTICE);
-        // } else {
-        //     ini_set('display_errors', 'Off');
-        // }
-
-        // if (file_exists(__DIR__ . '/../db.cfg.php')) {
-        //     include __DIR__ . '/../db.cfg.php';
-        //     $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
-        // } else {
-        //     // if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php')) {
-        //     //     include $_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php';
-        //     //     $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
-        //     // }
-
-        //    // можно добавить свои настройки на прямую, но не желательно
-        //     // else {
-        //     // $dbConnection = new PDO('mysql:dbname='database';host='localhost';charset=utf8', 'user', 'password');
-        //     //}
-        // }
-        // $bd = $this->db;
-    //     $dbConnection = new PDO('mysql:dbname=' . $this->db . ';host=' . $this->host . ';charset=utf8', $this->user, $this->pass);
-    //     $dbConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    //     $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    //     $dbConnection->exec('set names utf8');
-    //     $dbConnection->exec('SET SESSION group_concat_max_len = 1000000');
-    //     $dbConnection->exec("SET sql_mode=''");
-
-    //     return $dbConnection;
-    // }
-
-    public function getParams() {
-        return $this->db;   
+        } 
     }
 
     public static function q($sql, $params = [])
     {
-        // $dbConnection = self::getInstance();
+        $dbConnection = self::getInstance()->pdo;
 
         try {
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $dbConnection->prepare($sql);
             $stmt->execute($params);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -102,7 +60,7 @@ class SQL
 
     public static function q1($sql, $params = [])
     {
-         $dbConnection = self::getInstance();
+        $dbConnection = self::getInstance()->pdo;
 
         try {
             $stmt = $dbConnection->prepare($sql);
@@ -132,12 +90,12 @@ class SQL
 
     public static function qi($sql, $params = [], $ignore_exceptions = 0)
     {
-        // $dbConnection = self::getInstance();
+        $dbConnection = self::getInstance()->pdo;
         try {
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $dbConnection->prepare($sql);
 
             if ($stmt->execute($params)) {
-                return $this->pdo->lastInsertId();
+                return $dbConnection->lastInsertId();
             }
 
             return false;
@@ -161,8 +119,8 @@ class SQL
 
     public static function qCount($sql, $params = [])
     {
-        // $dbConnection = self::getInstance();
-        $stmt = $this->pdo->prepare($sql);
+        $dbConnection = self::getInstance()->pdo;
+        $stmt = $dbConnection->prepare($sql);
         $stmt->execute($params);
 
         return $stmt->fetchColumn();
@@ -170,8 +128,8 @@ class SQL
 
     public static function qRows()
     {
-        // $dbConnection = self::getInstance();
-        $stmt = $$this->pdo->query('SELECT FOUND_ROWS() as num');
+        $dbConnection = self::getInstance()->pdo;
+        $stmt = $dbConnection->query('SELECT FOUND_ROWS() as num');
 
         return $stmt->fetchColumn(0);
     }

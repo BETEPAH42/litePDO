@@ -9,6 +9,7 @@ class configFile {
     public $host = "";
     public $username = "";
     public $password = "";
+    private static $instance;
 
     function __construct()
     {
@@ -36,5 +37,14 @@ class configFile {
             'password'  =>  $this->password,
         ];
         return $db;
+    }
+
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 }
