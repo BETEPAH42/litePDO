@@ -2,45 +2,38 @@
 
 namespace litePDO;
 
-class SQL
+use PDO;
+use configConect\configFile;
+use PDOException;
+
+class SQL 
 {
+    protected $params;
+    private static $instance;
+    private $pdo;
+
     /** Init and connect */
-    private static function init()
+    public function __construct()
     {
-        $dbConnection = null;
-        if (in_array($_SERVER['SERVER_NAME'], ['localhost'])) {
-            ini_set('display_errors', 'On');
-            error_reporting(E_ALL & ~E_NOTICE);
-        } else {
-            ini_set('display_errors', 'Off');
-        }
+        $params = new configFile();
+        $this->params = $params->getParams();
 
-        if (file_exists(__DIR__ . '/../db.cfg.php')) {
-            include __DIR__ . '/../db.cfg.php';
-            $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
-        } else {
-            if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php')) {
-                include $_SERVER['DOCUMENT_ROOT'] . '/db.cfg.php';
-                $dbConnection = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';charset=utf8', DB_USER, DB_PASS);
-            }
-            // можно добавить свои настройки на прямую, но не желательно
-            // else {
-            // $dbConnection = new PDO('mysql:dbname='database';host='localhost';charset=utf8', 'user', 'password');
-            //}
-        }
-
-        $dbConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $dbConnection->exec('set names utf8');
-        $dbConnection->exec('SET SESSION group_concat_max_len = 1000000');
-        $dbConnection->exec("SET sql_mode=''");
-
-        return $dbConnection;
+        try{
+            $this->pdo = new PDO('mysql:dbname=' . $this->params['db'] . ';host=' . $this->params['host']. ';charset=utf8', $this->params['username'], $this->params['password']);
+            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->exec('set names utf8');
+            $this->pdo->exec('SET SESSION group_concat_max_len = 1000000');
+            $this->pdo->exec("SET sql_mode=''");
+        } catch (PDOException $e) {
+            print "Error!: <pre>" . print_r($e)."</pre>";
+            die();
+        } 
     }
 
     public static function q($sql, $params = [])
     {
-        $dbConnection = self::init();
+        $dbConnection = self::getInstance()->pdo;
 
         try {
             $stmt = $dbConnection->prepare($sql);
@@ -48,7 +41,7 @@ class SQL
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             if (in_array($_SERVER['SERVER_NAME'], ['localhost'])) {
                 // echo '<pre>';
                 // echo $sql;
@@ -67,7 +60,7 @@ class SQL
 
     public static function q1($sql, $params = [])
     {
-        $dbConnection = self::init();
+        $dbConnection = self::getInstance()->pdo;
 
         try {
             $stmt = $dbConnection->prepare($sql);
@@ -75,7 +68,7 @@ class SQL
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return $result;
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             if (in_array($_SERVER['SERVER_NAME'], ['localhost'])) {
                 // echo '<pre>';
                 // print_r($e);
@@ -97,7 +90,7 @@ class SQL
 
     public static function qi($sql, $params = [], $ignore_exceptions = 0)
     {
-        $dbConnection = self::init();
+        $dbConnection = self::getInstance()->pdo;
         try {
             $stmt = $dbConnection->prepare($sql);
 
@@ -106,7 +99,7 @@ class SQL
             }
 
             return false;
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             if ($ignore_exceptions) {
                 return;
             }
@@ -126,8 +119,7 @@ class SQL
 
     public static function qCount($sql, $params = [])
     {
-        $dbConnection = self::init();
-
+        $dbConnection = self::getInstance()->pdo;
         $stmt = $dbConnection->prepare($sql);
         $stmt->execute($params);
 
@@ -136,10 +128,22 @@ class SQL
 
     public static function qRows()
     {
-        $dbConnection = self::init();
-
+        $dbConnection = self::getInstance()->pdo;
         $stmt = $dbConnection->query('SELECT FOUND_ROWS() as num');
 
         return $stmt->fetchColumn(0);
+    }
+    public function __call($method, $args)
+    {
+        return call_user_func_array(array($this->pdo, $method), $args);
+    }
+
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 }
