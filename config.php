@@ -1,7 +1,7 @@
 <?php
 $params = array (
     'db'=>'dev',
-    'host' => 'localhost',
+    'host' => 'mysql',
     'username' => 'dev',
     'password' => 'dev'
 );

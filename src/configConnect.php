@@ -10,10 +10,16 @@ class configFile {
     public $username = "";
     public $password = "";
 
-    function __construct($file)
+    function __construct()
     {
-        if(file_exists($file)) {
-            include_once($file);
+        if(file_exists('config.php')) {
+            $params = [
+                'db'=>'',
+                'host'=>'',
+                'username'=>'',
+                'password'=>'',
+            ];
+            include_once('config.php');
             // $this->type = '';
             $this->db = $params['db'];
             $this->host = $params['host'];
