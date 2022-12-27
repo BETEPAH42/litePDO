@@ -1,7 +1,7 @@
 <?php
 $params = array (
-    'db'=>'aloneisland',
-    'host' => 'localhost',
-    'username' => 'LaravelUser',
-    'password' => 'Bb359722'
+    'db'=>'dev',
+    'host' => 'mysql',
+    'username' => 'dev',
+    'password' => 'dev'
 );

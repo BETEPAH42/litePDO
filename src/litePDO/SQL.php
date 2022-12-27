@@ -15,6 +15,7 @@ class SQL
     /** Init and connect */
     public function __construct()
     {
+        include_once 'configConnect.php';
         $params = new configFile();
         $this->params = $params->getParams();
 
