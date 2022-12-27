@@ -12,8 +12,9 @@
         }
     ],
     "autoload": {
+        "psr-4": {"litePDO\\": "src/litePDO/"}
     },
     "require": {
-        "php": "^7.4 || ^8.0"
+        "php": "^7.4"
     }
 }

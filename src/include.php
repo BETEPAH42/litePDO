@@ -1,3 +1,2 @@
 <?php
-include_once 'configConnect.php';
-include_once 'SQL.php';
+include_once 'litePDO/SQL.php';
