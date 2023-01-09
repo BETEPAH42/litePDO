@@ -20,7 +20,7 @@ class SQL
         $this->params = $params->getParams();
 
         try{
-            $this->pdo = new PDO('mysql:dbname=' . $this->params['db'] . ';host=' . $this->params['host']. ';charset=utf8', $this->params['username'], $this->params['password']);
+            $this->pdo = new PDO($params->getStringDsnMySQL(),$params->getUsername(),$params->getPassword());
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->exec('set names utf8');
