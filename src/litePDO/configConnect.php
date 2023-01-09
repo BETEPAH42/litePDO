@@ -4,11 +4,11 @@ namespace configConect;
 
 class configFile {
 
-    public $db = "";
+    private $db = "";
     // public $type = "";
-    public $host = "";
-    public $username = "";
-    public $password = "";
+    private $host = "";
+    private $username = "";
+    private $password = "";
     private static $instance;
 
     function __construct()
@@ -46,5 +46,17 @@ class configFile {
         }
 
         return self::$instance;
+    }
+
+    public function getStringDsnMySQL() {
+        return "mysql:dbname={$this->db};host={$this->host};charset=utf8";
+    } 
+    
+    public function getUsername() {
+       return $this->username;
+    }   
+
+    public function getPassword() {
+        return $this->password;
     }
 }
