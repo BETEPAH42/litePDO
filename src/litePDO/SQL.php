@@ -16,6 +16,10 @@ class SQL
     public function __construct()
     {
         $this->getParams();
+        $this->init();
+    }
+
+    protected function init() {
         try{
             $this->pdo = new PDO($this->params->getStringDsnMySQL(),$this->params->getUsername(),$this->params->getPassword());
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
@@ -31,9 +35,10 @@ class SQL
 
     protected function getParams() 
     {
-        include_once 'configConnect.php';
+        include_once __DIR__.'/configConnect.php';
         $this->params = new configFile();
         $this->params->getInstance();
+        // var_dump($this->params->getStringDsnMySQL());
     }
 
     public function q($sql, $params = [])
