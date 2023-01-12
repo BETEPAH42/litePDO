@@ -3,7 +3,7 @@
 namespace litePDO;
 
 use PDO;
-use configConect\configFile;
+use ConfigConect\ConfigFile;
 use PDOException;
 
 class SQL 
@@ -36,7 +36,7 @@ class SQL
     protected function getParams() 
     {
         include_once __DIR__.'/configConnect.php';
-        $this->params = new configFile();
+        $this->params = new ConfigFile();
         $this->params->getInstance();
         // var_dump($this->params->getStringDsnMySQL());
     }
