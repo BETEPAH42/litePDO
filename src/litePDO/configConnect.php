@@ -1,8 +1,8 @@
 <?php
 
-namespace configConect;
+namespace ConfigConect;
 
-class configFile {
+class ConfigFile {
 
     private $db = "";
     // public $type = "";

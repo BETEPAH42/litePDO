@@ -3,24 +3,25 @@
 namespace litePDO;
 
 use PDO;
-use configConect\configFile;
+use ConfigConect\ConfigFile;
 use PDOException;
 
 class SQL 
 {
     protected $params;
-    private static $instance;
-    private $pdo;
+    protected static $instance;
+    protected $pdo;
 
     /** Init and connect */
     public function __construct()
     {
-        include_once 'configConnect.php';
-        $params = new configFile();
-        $this->params = $params->getParams();
+        $this->getParams();
+        $this->init();
+    }
 
+    protected function init() {
         try{
-            $this->pdo = new PDO($params->getStringDsnMySQL(),$params->getUsername(),$params->getPassword());
+            $this->pdo = new PDO($this->params->getStringDsnMySQL(),$this->params->getUsername(),$this->params->getPassword());
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->exec('set names utf8');
@@ -32,7 +33,15 @@ class SQL
         } 
     }
 
-    public static function q($sql, $params = [])
+    protected function getParams() 
+    {
+        include_once __DIR__.'/configConnect.php';
+        $this->params = new ConfigFile();
+        $this->params->getInstance();
+        // var_dump($this->params->getStringDsnMySQL());
+    }
+
+    public function q($sql, $params = [])
     {
         $dbConnection = self::getInstance()->pdo;
 
@@ -59,7 +68,7 @@ class SQL
         }
     }
 
-    public static function q1($sql, $params = [])
+    public function q1($sql, $params = [])
     {
         $dbConnection = self::getInstance()->pdo;
 
@@ -89,7 +98,7 @@ class SQL
         }
     }
 
-    public static function qi($sql, $params = [], $ignore_exceptions = 0)
+    public function qi($sql, $params = [], $ignore_exceptions = 0)
     {
         $dbConnection = self::getInstance()->pdo;
         try {
@@ -118,7 +127,7 @@ class SQL
         }
     }
 
-    public static function qCount($sql, $params = [])
+    public function qCount($sql, $params = [])
     {
         $dbConnection = self::getInstance()->pdo;
         $stmt = $dbConnection->prepare($sql);
@@ -127,7 +136,7 @@ class SQL
         return $stmt->fetchColumn();
     }
 
-    public static function qRows()
+    public function qRows()
     {
         $dbConnection = self::getInstance()->pdo;
         $stmt = $dbConnection->query('SELECT FOUND_ROWS() as num');
