@@ -17,7 +17,7 @@ class SQL
     {
         $this->getParams();
         try{
-            $this->pdo = new PDO($this->getStringDsnMySQL(),$this->getUsername(),$this->getPassword());
+            $this->pdo = new PDO($this->params->getStringDsnMySQL(),$this->params->getUsername(),$this->params->getPassword());
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->exec('set names utf8');
@@ -34,21 +34,6 @@ class SQL
         include_once 'configConnect.php';
         $this->params = new configFile();
         $this->params->getInstance();
-    }
-
-    protected function getStringDsnMySQL() 
-    {
-        return $this->params->getStringDsnMySQL();
-    }
-
-    protected function getUsername() 
-    {
-        return $this->params->getUsername();
-    }
-
-    protected function getPassword() 
-    {
-        return $this->params->getPassword();
     }
 
     public function q($sql, $params = [])
